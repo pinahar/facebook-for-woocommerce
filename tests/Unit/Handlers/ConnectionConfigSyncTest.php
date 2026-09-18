@@ -89,6 +89,14 @@ class ConnectionConfigSyncTest extends \WooCommerce\Facebook\Tests\AbstractWPUni
 		$connection_mock->method( 'is_connected' )
 			->willReturn( true );
 
+		// Fail STEFI calls without network access; the Graph tail below is unchanged.
+		$this->add_filter_with_safe_teardown(
+			'pre_http_request',
+			function () {
+				return new \WP_Error( 'http_request_failed', 'STEFI unavailable in this test.' );
+			}
+		);
+
 		// Should log start message (at minimum)
 		$this->plugin_mock->expects( $this->atLeastOnce() )
 			->method( 'log' );
